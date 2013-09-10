@@ -44,6 +44,30 @@ module Bitcasa
       end
     end
 
+    # FIXME: Writing is broken completely
+    def can_write?(path)
+      puts "DEBUG: can_write? #{path} STUB"
+      false
+    end
+
+    # FIXME: Block write?
+    # FIXME: Writing is broken completely
+    def write_to(path, content)
+      puts "DEBUG: write_to #{path} #{content.inspect}"
+      dir, _, file = path.rpartition('/')
+      fakeio = Object.new
+      def fakeio.original_filename
+        file
+      end
+      def fakeio.read
+        content
+      end
+      def fakeio.close
+        true
+      end
+      @session.upload(dir, file, fakeio)
+    end
+
     def size(path)
       puts "DEBUG: size #{path}"
       dir, _, file = path.rpartition('/')

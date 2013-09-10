@@ -6,12 +6,16 @@ GEM
       debugger-linecache (~> 1.2.0)
     columnize (0.3.6)
     debugger-linecache (1.2.0)
+    httmultiparty (0.3.10)
+      httparty (>= 0.7.3)
+      multipart-post
     httparty (0.11.0)
       multi_json (~> 1.0)
       multi_xml (>= 0.5.2)
     mini_portile (0.5.1)
     multi_json (1.8.0)
     multi_xml (0.5.5)
+    multipart-post (1.2.0)
     nokogiri (1.6.0)
       mini_portile (~> 0.5.0)
     rfuse (1.0.3)
@@ -23,6 +27,7 @@ PLATFORMS
 
 DEPENDENCIES
   byebug
+  httmultiparty
   httparty
   nokogiri
   rfusefs

@@ -2,8 +2,9 @@ require "cgi" # for CGI::Escape
 
 module Bitcasa
   class Session
-    include HTTParty
+    include HTTMultiParty
     base_uri "https://my.bitcasa.com/"
+    debug_output $stdout
 
     def initialize(username, password)
       # Get CSRF token, code parameter and session cookie
@@ -99,6 +100,18 @@ module Bitcasa
         @@dl_cache[id] = content
       end
       return @@dl_cache[id]
+    end
+
+    # FIXME: Completely broken. Does nothing
+    def upload(directory, filename, file)
+      def file.original_filename
+        filename
+      end
+      response = post "/files?path=/#{@root_id}/#{directory}", :file => file
+      byebug
+
+      # FIXME: Clear cache for this directory in order for the new files to
+      # show up.
     end
 
     private
