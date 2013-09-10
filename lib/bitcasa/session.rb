@@ -35,11 +35,33 @@ module Bitcasa
 
       # Get root node id
       @root = (get "/directory/").parsed_response[0]["path"]
-      byebug
     end
 
     def logout!
       # Implement me
+    end
+
+    def ls(path = nil)
+      raise "Not implemented" if !path.nil?
+      entries = (get "/directory#{@root}").parsed_response.map do |e|
+        r = {}
+        r[:type] = case e["category"]
+                    when "documents"
+                      :file
+                    when "folders"
+                      :dir
+                    else
+                      raise "Unknown category: #{e["category"]}"
+                    end
+        r[:mtime] = e["mtime"]
+        r[:size]  = e["size"] if r[:type] == :file
+        r[:name]  = e["name"]
+        r
+      end
+    end
+
+    def root
+      @root
     end
 
     private
