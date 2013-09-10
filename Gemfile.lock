@@ -15,6 +15,8 @@ GEM
     nokogiri (1.6.0)
       mini_portile (~> 0.5.0)
     rfuse (1.0.3)
+    rfusefs (1.0.0)
+      rfuse (~> 1.0)
 
 PLATFORMS
   ruby
@@ -23,4 +25,4 @@ DEPENDENCIES
   byebug
   httparty
   nokogiri
-  rfuse
+  rfusefs

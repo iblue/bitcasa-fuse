@@ -34,7 +34,11 @@ module Bitcasa
       self.class.headers["Cookie"] = cookie
 
       # Get root node id
-      @root = (get "/directory/").parsed_response[0]["path"]
+      r = get "/directory/"
+      if r.code != 200
+        raise "Could not get root node id"
+      end
+      @root_id = r.parsed_response[0]["path"].gsub('/','')
     end
 
     def logout!
@@ -42,26 +46,37 @@ module Bitcasa
     end
 
     def ls(path = nil)
-      raise "Not implemented" if !path.nil?
-      entries = (get "/directory#{@root}").parsed_response.map do |e|
-        r = {}
-        r[:type] = case e["category"]
-                    when "documents"
-                      :file
-                    when "folders"
-                      :dir
-                    else
-                      raise "Unknown category: #{e["category"]}"
-                    end
-        r[:mtime] = e["mtime"]
-        r[:size]  = e["size"] if r[:type] == :file
-        r[:name]  = e["name"]
-        r
-      end
-    end
+      path = '/' if path.nil?
+      path += '/' if path[-1] != '/' # Ending slash needed for rqst
 
-    def root
-      @root
+      # FIXME: Expire cache or things will get fucked up
+      @@cache ||= {}
+      if !@@cache[path]
+        rqst_path = "/directory/#{@root_id}#{path}"
+        puts "DEBUG: Cache miss on #{path} -> RQST to #{rqst_path}"
+        r = get rqst_path
+        if r.code != 200
+          return [] # FIXME?
+        end
+
+        @@cache[path] = r.parsed_response.map do |e|
+          r = {}
+          r[:type] = case e["category"]
+                      when "documents"
+                        :file
+                      when "folders"
+                        :dir
+                      else
+                        raise "Unknown category: #{e["category"]}"
+                      end
+          r[:mtime] = e["mtime"]
+          r[:size]  = e["size"] if r[:type] == :file
+          r[:name]  = e["name"]
+          r
+        end
+      end
+
+      return @@cache[path]
     end
 
     private

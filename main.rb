@@ -6,15 +6,14 @@ Bundler.require
 
 # Load local stuff
 require './lib/bitcasa/session.rb'
-require './lib/bitcasa/fuse.rb'
-
+require './lib/bitcasa/directory.rb'
 
 # Login
 require "./my-password.rb"
 puts "Logging in..."
 session = Bitcasa::Session.new(IBLUE_USERNAME, IBLUE_PASSWORD)
 puts "Initializing file system..."
-fuse    = Bitcasa::Fuse.new(session)
+root    = Bitcasa::Directory.new(session)
 
 if ARGV.length == 0
   print "\n"
@@ -29,18 +28,4 @@ if ARGV.length == 0
   exit(1)
 end
 
-fo = RFuse::FuseDelegator.new(fuse, *ARGV)
-
-if fo.mounted?
-  Signal.trap("TERM") { print "Caught TERM\n" ; fo.exit }
-  Signal.trap("INT") { print "Caught INT\n"; fo.exit }
-
-  begin
-    fo.loop
-  rescue
-    print "Error:" + $!
-  ensure
-    fo.unmount if fo.mounted?
-    print "Unmounted #{ARGV[0]}\n"
-  end
-end
+FuseFS.start(root, *ARGV)
