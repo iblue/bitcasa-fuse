@@ -1,3 +1,5 @@
+require "cgi" # for CGI::Escape
+
 module Bitcasa
   class Session
     include HTTParty
@@ -75,11 +77,28 @@ module Bitcasa
           r[:mtime] = e["mtime"]
           r[:size]  = e["size"] if r[:type] == :file
           r[:name]  = e["name"]
+          r[:id]    = e["id"]
+          r[:mime]  = e["mime"]
           r
         end
       end
 
       return @@cache[path]
+    end
+
+    def download(entry)
+      id   = entry[:id]
+      size = entry[:size]
+      mime = CGI::escape entry[:mime]
+      name = CGI::escape entry[:name]
+      @@dl_cache ||= {}
+      if !@@dl_cache[id]
+        rqst_path = "/file/#{id}/download/#{name}?size=#{size}&mime=#{mime}"
+        puts "DEBUG: Cache miss on ID #{id} -> RQST #{rqst_path}"
+        content = get rqst_path
+        @@dl_cache[id] = content
+      end
+      return @@dl_cache[id]
     end
 
     private

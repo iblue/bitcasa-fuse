@@ -32,9 +32,16 @@ module Bitcasa
       end
     end
 
+    # FIXME: Block read?
     def read_file(path)
       puts "DEBUG: read_file #{path}"
-      raise "Not implemented"
+      dir, _, file = path.rpartition('/')
+      contents = @session.ls(dir)
+      if (entry = contents.select{|x| x[:name] == file}[0])
+        @session.download(entry)
+      else
+        "" # FIXME? raise errorcode?
+      end
     end
 
     def size(path)
@@ -44,7 +51,7 @@ module Bitcasa
       if (entry = contents.select{|x| x[:name] == file}[0])
         entry[:size]
       else
-        0
+        0 # FIXME? raise errorcode?
       end
     end
 
