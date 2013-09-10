@@ -11,7 +11,7 @@ require './lib/bitcasa/directory.rb'
 # Login
 require "./my-password.rb"
 puts "Logging in..."
-session = Bitcasa::Session.new(IBLUE_USERNAME, IBLUE_PASSWORD)
+session = Bitcasa::Session.new(USERNAME, PASSWORD)
 puts "Initializing file system..."
 root    = Bitcasa::Directory.new(session)
 
