@@ -41,11 +41,24 @@ module Bitcasa
       puts "DEBUG: size #{path}"
       dir, _, file = path.rpartition('/')
       contents = @session.ls(dir)
-      if (entry = contents.select{|x| x[:name] == file})
+      if (entry = contents.select{|x| x[:name] == file}[0])
         entry[:size]
       else
         0
       end
+    end
+
+    # atime, mtime, ctime
+    def times(path)
+      puts "DEBUG: mtime #{path}"
+      dir, _, file = path.rpartition('/')
+      contents = @session.ls(dir)
+      mtime = if (entry = contents.select{|x| x[:name] == file}[0])
+        entry[:mtime] / 1000 # mtime is in msec
+      else
+        0
+      end
+      [mtime, mtime, mtime] # We get only mtime from api
     end
 
     #def readdir(ctx, path, filler, offset, ffi)
