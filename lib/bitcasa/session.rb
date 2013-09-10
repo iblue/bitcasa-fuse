@@ -56,18 +56,21 @@ module Bitcasa
         puts "DEBUG: Cache miss on #{path} -> RQST to #{rqst_path}"
         r = get rqst_path
         if r.code != 200
+          puts "DEBUG: Return code != 200"
+          byebug
           return [] # FIXME?
         end
 
         @@cache[path] = r.parsed_response.map do |e|
           r = {}
-          r[:type] = case e["category"]
-                      when "documents"
+          r[:type] = case e["type"]
+                      when 0
                         :file
-                      when "folders"
+                      when 1
                         :dir
                       else
-                        raise "Unknown category: #{e["category"]}"
+                        byebug
+                        raise "Unknown type: #{e["type"]}"
                       end
           r[:mtime] = e["mtime"]
           r[:size]  = e["size"] if r[:type] == :file
